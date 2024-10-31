@@ -9,8 +9,8 @@ from auth.database import Users
 from auth.menager import get_user_manager
 from auth.schemas import UserRead, UserCreate
 import joblib
-
-model = joblib.load("/home/vadim/spying_on_Alice/ml_model/model.joblib")
+from ml_model.preprocessing import preprocess
+model = joblib.load("C:/Users/79853/Desktop/ptml/spying_on_Alice/ml_model/modell.joblib")
 
 app = FastAPI(
     title="App"
@@ -45,24 +45,19 @@ def protected_route(users: Users = Depends(current_user)):
 def unprotected_route():
     return f"Hello, anonym"
 
-class Session(BaseModel):
-    time1: int
-    site1: int
-    time2: int
-    site2: int
-
 
 @app.post("/predict")
-def predict(session: Session):
-    features = [[
-        session.time1,
-        session.site1,
-        session.time2,
-        session.site2,
-    ]]
+def predict():
+    # Выполнение препроцессинга данных из файла `one_str.csv`
+    features_sparse = preprocess()
 
-    pred = model.predict(features).tolist()[0]
-    return {
-        "prediction": pred
-    }
+    # Получение предсказания
+    pred = model.predict(features_sparse).tolist()
+    return {"predictions": pred}
+
+
+
+
+
+
 
