@@ -1,46 +1,70 @@
-# для полного переобучения всец модели
 import joblib
-import numpy as np
 import pandas as pd
-from scipy.sparse import csr_matrix
 from sklearn.linear_model import LogisticRegression
+import numpy as np
+import os
+from ml_model.preprocessing import preprocess
+model_path_1 = "C:/Users/79853/Desktop/ptml/spying_on_Alice/ml_model/model_v1.joblib"
+model_path_2 = "C:/Users/79853/Desktop/ptml/spying_on_Alice/ml_model/model_v2.joblib"
+active_model_path = model_path_1
+standby_model_path = model_path_2
+model = None
 
-if __name__ == '__main__':
-    # Чтение данных
-    train_df = pd.read_csv("train_sessions.csv", index_col="session_id")
 
-    # Преобразование временных меток
+def load_and_preprocess_data():
+    # Загружаем и обрабатываем данные
+    train_df = pd.read_csv("C:/Users/79853/Desktop/ptml/spying_on_Alice/ml_model/train_sessions.csv", index_col="session_id")
     times = ["time%s" % i for i in range(1, 11)]
     train_df[times] = train_df[times].apply(pd.to_datetime)
-
-    # Сортировка по времени первой сессии
     train_df = train_df.sort_values(by="time1")
 
     for col in train_df.columns:
         if 'time' in col:
-            train_df[col].fillna(train_df[col].max(), inplace=True)
+            train_df[col] = train_df[col].fillna(train_df[col].max())
 
-    # Преобразование временных данных в числовые
     for col in train_df.columns:
         if 'time' in col:
-            train_df[col] = train_df[col].astype(int) // 10 ** 9  # Преобразовать в секунды
+            train_df[col] = train_df[col].astype(int) // 10 ** 9
 
-    # Преобразование сайтов в целочисленные значения
     sites = ["site%s" % i for i in range(1, 11)]
     train_df[sites] = train_df[sites].fillna(0).astype("int")
 
-
-    # Целевая переменная
     y_train = train_df["target"]
     train_df = train_df.drop("target", axis=1)
 
+    return train_df, y_train
 
 
-    # Обучение модели
-    model = LogisticRegression(n_jobs=-1, random_state=17)
-    model.fit(train_df, y_train)
+def train_or_update_model(X_train, y_train):
+    global model
+    if model is None:
+        model = LogisticRegression(max_iter=1000)
+        model.fit(X_train, y_train)
+    else:
+        model.fit(X_train, y_train)
+    return model
 
-    # Сохранение обученной модели в файл с использованием joblib
-    joblib.dump(model, "./modell.joblib")
 
+def save_model():
+    joblib.dump(model, standby_model_path)
+
+
+def switch_model():
+    global active_model_path, standby_model_path
+    active_model_path, standby_model_path = standby_model_path, active_model_path
+    load_model()  # Перезагружаем модель из нового активного файла
+
+
+def load_model():
+    global model
+    if os.path.exists(active_model_path):
+        model = joblib.load(active_model_path)
+
+
+def get_model_prediction():
+    if model:
+        features_sparse = preprocess()
+        return model.predict(features_sparse).tolist()
+    else:
+        return "Модель ещё не загружена."
 

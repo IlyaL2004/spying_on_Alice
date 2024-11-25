@@ -1,20 +1,38 @@
 from pydantic import BaseModel
 
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, BackgroundTasks
 
-from typing import Union, Annotated
 from fastapi_users import fastapi_users, FastAPIUsers
 from auth.auth import auth_backend
 from auth.database import Users
 from auth.menager import get_user_manager
 from auth.schemas import UserRead, UserCreate
-import joblib
-from ml_model.preprocessing import preprocess
-model = joblib.load("C:/Users/79853/Desktop/ptml/spying_on_Alice/ml_model/modell.joblib")
+
+from ml_model.model import get_model_prediction, load_model
+from ml_model.background_tasks import start_update_model_task
+from send_message_email.send_message import send_email
+
 
 app = FastAPI(
     title="App"
 )
+
+@app.on_event("startup")
+async def startup_event():
+    # Загрузка модели при старте приложения
+    load_model()
+    # Запускаем фоновую задачу обновления модели
+    start_update_model_task()
+
+@app.get("/predict")
+async def predict_endpoint():
+    prediction = get_model_prediction()
+    subject = "Статус предсказания модели"
+    body = f"Модель завершила предсказание. Результат: {prediction}"
+    # Отправка уведомления на почту
+    send_email(subject, body)
+    return {"predictions": prediction}
+
 
 fastapi_users = FastAPIUsers[Users, int](
     get_user_manager,
@@ -46,14 +64,7 @@ def unprotected_route():
     return f"Hello, anonym"
 
 
-@app.post("/predict")
-def predict():
-    # Выполнение препроцессинга данных из файла `one_str.csv`
-    features_sparse = preprocess()
 
-    # Получение предсказания
-    pred = model.predict(features_sparse).tolist()
-    return {"predictions": pred}
 
 
 
