@@ -1,5 +1,7 @@
 from datetime import datetime, timedelta
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, HTTPException
+from pydantic import BaseModel
+from typing import List, Union
 
 from fastapi_users import FastAPIUsers
 from auth.auth import auth_backend
@@ -7,7 +9,7 @@ from auth.database import Users, get_async_session
 from auth.menager import get_user_manager
 from auth.schemas import UserRead, UserCreate
 
-from ml_model.model import get_model_prediction, load_model
+from ml_model.model import get_model_prediction_with_input, load_model
 from ml_model.background_tasks import start_update_model_task
 from send_message_email.send_message import send_email
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -18,6 +20,10 @@ from auth.database import Users
 app = FastAPI(
     title="App"
 )
+
+# Модель данных для ввода list_values
+class PredictionInput(BaseModel):
+    list_values: List[Union[int, float, str]]
 
 @app.on_event("startup")
 async def startup_event():
@@ -67,21 +73,20 @@ async def subscribe(users: Users = Depends(current_user), session: AsyncSession 
     return {"message": "Subscription activated for 30 days"}
 
 
-@app.get("/predict")
-async def predict_endpoint(users: Users = Depends(current_user)):
-    # Проверка, является ли пользователь администратором
-    if not users.is_superuser:
-        # Если пользователь не администратор, проверяем статус подписки
-        if not users.subscription_end or users.subscription_end < datetime.utcnow():
-            return {"error": "Your subscription has expired. Please renew it to access this feature."}
+@app.post("/predict")
+async def predict_endpoint(
+    input_data: PredictionInput,
+    users: Users = Depends(current_user)
+):
+    if not users.subscription_end or users.subscription_end < datetime.utcnow():
+        raise HTTPException(status_code=403, detail="Your subscription has expired. Please renew it to access this feature.")
 
-    prediction = get_model_prediction()
-    subject = "Статус предсказания модели"
-    body = f"Модель завершила предсказание. Результат: {prediction}"
+    prediction = get_model_prediction_with_input(input_data.list_values)
+    subject = "Model Prediction Status"
+    body = f"The model has completed its prediction. Result: {prediction}"
     # Отправка уведомления на почту
     send_email(subject, body)
     return {"predictions": prediction}
-
 
 
 @app.get("/protected-route")

@@ -3,7 +3,8 @@ import pandas as pd
 from sklearn.linear_model import LogisticRegression
 import numpy as np
 import os
-from ml_model.preprocessing import preprocess
+from ml_model.preprocessing import preprocess_with_input
+
 model_path_1 = "C:/Users/79853/Desktop/ptml/spying_on_Alice/ml_model/model_v1.joblib"
 model_path_2 = "C:/Users/79853/Desktop/ptml/spying_on_Alice/ml_model/model_v2.joblib"
 active_model_path = model_path_1
@@ -61,10 +62,9 @@ def load_model():
         model = joblib.load(active_model_path)
 
 
-def get_model_prediction():
+def get_model_prediction_with_input(list_values):
     if model:
-        features_sparse = preprocess()
+        features_sparse = preprocess_with_input(list_values)
         return model.predict(features_sparse).tolist()
     else:
-        return "Модель ещё не загружена."
-
+        return "Model is not yet loaded."
