@@ -2,6 +2,7 @@ import uuid
 from typing import Optional
 
 from fastapi_users import schemas
+from datetime import datetime
 
 
 class UserRead(schemas.BaseUser[int]):
@@ -11,6 +12,7 @@ class UserRead(schemas.BaseUser[int]):
     is_active: bool = True
     is_superuser: bool = False
     is_verified: bool = False
+    subscription_end: Optional[datetime]
 
     class Config: #!
         orm_mode = True #!

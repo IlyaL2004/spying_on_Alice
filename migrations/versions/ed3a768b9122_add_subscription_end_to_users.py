@@ -1,8 +1,8 @@
-"""Initiall11
+"""Add subscription_end to Users
 
-Revision ID: 6a8e416e7fa3
-Revises: ec94219ae7fe
-Create Date: 2024-10-29 00:19:20.652889
+Revision ID: ed3a768b9122
+Revises: bfa0a63d4bb0
+Create Date: 2024-11-27 21:26:31.767470
 
 """
 from typing import Sequence, Union
@@ -12,8 +12,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '6a8e416e7fa3'
-down_revision: Union[str, None] = 'ec94219ae7fe'
+revision: str = 'ed3a768b9122'
+down_revision: Union[str, None] = 'bfa0a63d4bb0'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 

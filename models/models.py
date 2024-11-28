@@ -1,5 +1,4 @@
 from datetime import datetime
-
 from sqlalchemy import MetaData, Table, Column, Integer, String, TIMESTAMP, ForeignKey, JSON, Boolean
 
 metadata = MetaData()
@@ -13,10 +12,10 @@ users = Table(
     Column("username", String, nullable=False),
     Column("hashed_password", String, nullable=False),
     Column("registered_at", TIMESTAMP, default=datetime.utcnow),
-
     Column("is_active", Boolean, default=True, nullable=False),
     Column("is_superuser", Boolean, default=False, nullable=False),
     Column("is_verified", Boolean, default=False, nullable=False),
+    Column("subscription_end", TIMESTAMP, nullable=True),
 )
 
 sessions = Table(
@@ -44,9 +43,5 @@ sessions = Table(
     Column("site9", String, nullable=False),
     Column("time10", String, nullable=False),
     Column("site10", String, nullable=False),
-    Column("is_active", Boolean, default=True, nullable=False),
-    Column("is_superuser", Boolean, default=False, nullable=False),
-    Column("is_verified", Boolean, default=False, nullable=False),
 )
 
-# request models
