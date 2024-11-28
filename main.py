@@ -21,9 +21,11 @@ app = FastAPI(
     title="App"
 )
 
+
 # Модель данных для ввода list_values
 class PredictionInput(BaseModel):
     list_values: List[Union[int, float, str]]
+
 
 @app.on_event("startup")
 async def startup_event():
@@ -43,7 +45,6 @@ app.include_router(
     prefix="/auth/jwt",
     tags=["auth"],
 )
-
 
 app.include_router(
     fastapi_users.get_register_router(UserRead, UserCreate),
@@ -75,17 +76,24 @@ async def subscribe(users: Users = Depends(current_user), session: AsyncSession 
 
 @app.post("/predict")
 async def predict_endpoint(
-    input_data: PredictionInput,
-    users: Users = Depends(current_user)
+        input_data: PredictionInput,
+        users: Users = Depends(current_user)
 ):
     if not users.subscription_end or users.subscription_end < datetime.utcnow():
-        raise HTTPException(status_code=403, detail="Your subscription has expired. Please renew it to access this feature.")
+        raise HTTPException(status_code=403,
+                            detail="Your subscription has expired. Please renew it to access this feature.")
 
-    prediction = get_model_prediction_with_input(input_data.list_values)
-    subject = "Model Prediction Status"
-    body = f"The model has completed its prediction. Result: {prediction}"
-    # Отправка уведомления на почту
-    send_email(subject, body)
+    # Удаляем email из данных, чтобы он не использовался для предсказания
+    filtered_data = [value for value in input_data.list_values if not isinstance(value, str) or "@" not in value]
+
+    prediction = get_model_prediction_with_input(filtered_data)
+
+    # Если предсказание равно 0, отправить письмо
+    if prediction == [0]:
+        subject = "Model Alert"
+        body = f"Model predicted 0 for the input: {filtered_data}. Please take action."
+        send_email(subject, body)
+
     return {"predictions": prediction}
 
 

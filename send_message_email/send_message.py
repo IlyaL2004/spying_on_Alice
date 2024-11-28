@@ -6,7 +6,7 @@ from email.mime.text import MIMEText
 SMTP_SERVER = "smtp.gmail.com"
 SMTP_PORT = 587
 SENDER_EMAIL = "ilyalarin2021@gmail.com"  # Укажите вашу почту
-SENDER_PASSWORD = "mzpx gvmq azvm zwrx"  # Укажите пароль к вашей почте
+SENDER_PASSWORD = "oghg jqqn yzfv hqry"  # Укажите пароль к вашей почте
 RECIPIENT_EMAIL = "ilalarin467@gmail.com"  # Кому отправить уведомление
 
 def send_email(subject: str, body: str):
