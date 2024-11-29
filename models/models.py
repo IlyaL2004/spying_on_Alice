@@ -1,9 +1,8 @@
 from datetime import datetime
-from sqlalchemy import MetaData, Table, Column, Integer, String, TIMESTAMP, ForeignKey, JSON, Boolean
+from sqlalchemy import MetaData, Table, Column, Integer, String, TIMESTAMP, ForeignKey, Boolean
 
 metadata = MetaData()
 
-# database models
 users = Table(
     "users",
     metadata,
@@ -21,27 +20,30 @@ users = Table(
 sessions = Table(
     "sessions",
     metadata,
-    Column("id", Integer, primary_key=True),
+    Column("session_id", Integer, primary_key=True),
     Column("user_id", Integer, ForeignKey(users.c.id)),
-    Column("time1", String, nullable=False),
-    Column("site1", String, nullable=False),
-    Column("time2", String, nullable=False),
-    Column("site2", String, nullable=False),
-    Column("time3", String, nullable=False),
-    Column("site3", String, nullable=False),
-    Column("time4", String, nullable=False),
-    Column("site4", String, nullable=False),
-    Column("time5", String, nullable=False),
-    Column("site5", String, nullable=False),
-    Column("time6", String, nullable=False),
-    Column("site6", String, nullable=False),
-    Column("time7", String, nullable=False),
-    Column("site7", String, nullable=False),
-    Column("time8", String, nullable=False),
-    Column("site8", String, nullable=False),
-    Column("time9", String, nullable=False),
-    Column("site9", String, nullable=False),
-    Column("time10", String, nullable=False),
-    Column("site10", String, nullable=False),
+    Column("time1", String, nullable=True),
+    Column("site1", String, nullable=True),
+    Column("time2", String, nullable=True),
+    Column("site2", String, nullable=True),
+    Column("time3", String, nullable=True),
+    Column("site3", String, nullable=True),
+    Column("time4", String, nullable=True),
+    Column("site4", String, nullable=True),
+    Column("time5", String, nullable=True),
+    Column("site5", String, nullable=True),
+    Column("time6", String, nullable=True),
+    Column("site6", String, nullable=True),
+    Column("time7", String, nullable=True),
+    Column("site7", String, nullable=True),
+    Column("time8", String, nullable=True),
+    Column("site8", String, nullable=True),
+    Column("time9", String, nullable=True),
+    Column("site9", String, nullable=True),
+    Column("time10", String, nullable=True),
+    Column("site10", String, nullable=True),
+    Column("email", String, nullable=True),
+    Column("target", Integer, nullable=True),
+    Column("confirmation", Boolean, nullable=True),
+    Column("date", TIMESTAMP, default=datetime.utcnow, nullable=True),
 )
-
