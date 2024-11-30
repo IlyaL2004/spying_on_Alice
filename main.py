@@ -3,7 +3,7 @@ from fastapi import FastAPI, Depends, HTTPException
 from pydantic import BaseModel
 from typing import List, Union
 
-from sqlalchemy import insert
+from sqlalchemy import insert, String
 
 from models.models import sessions
 from fastapi_users import FastAPIUsers
@@ -19,6 +19,18 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from auth.database import get_async_session
 from auth.database import Users
+from fastapi import Query
+from sqlalchemy.sql import select
+
+
+
+from fastapi import FastAPI, Query, Depends, HTTPException
+from sqlalchemy import update
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
+from sqlalchemy.sql.expression import cast
+from sqlalchemy.types import String
+
 
 app = FastAPI(
     title="App"
@@ -100,6 +112,7 @@ async def predict_endpoint(
     confirmation = prediction == [1]
     print(filtered_data)
     # Запись сессии в базу данных
+    time = datetime.utcnow()
     session_data = {
         "user_id": users.id,
         "time1": str(filtered_data[2]),
@@ -125,7 +138,7 @@ async def predict_endpoint(
         "email": email,
         "target": prediction[0],
         "confirmation": confirmation,
-        "date": datetime.utcnow()
+        "date": time
     }
 
 
@@ -135,10 +148,59 @@ async def predict_endpoint(
     # Отправка уведомления при предсказании 0
     if not confirmation:
         subject = "Model Alert"
-        body = f"Model predicted 0 for the input: {filtered_data}. Please take action."
+        body = f"На вашем аккаунте выполнены подозрительные действия. Вам следует сменить пароль. Помогите нам лучше распознавать подозрительные действия, перейдите по сыслке ""http://127.0.0.1:8000/docs#/default/check_session_check_session_get"" введите свою почту, это время " + str(time) + " и если вы согласны с предсказание введидте да, если не согласны, то введите нет"
         send_email(subject, body, email)
 
     return {"predictions": prediction}
+
+
+
+@app.get("/check-session")
+async def check_session(
+        email: str = Query(..., description="Email пользователя для проверки"),
+        date: str = Query(..., description="Дата"),
+        confirmation: str = Query(..., description="Подтверждение: да или нет"),
+        session: AsyncSession = Depends(get_async_session)
+):
+    # Преобразуем 'confirmation' в логическое значение
+    confirmation_bool = True if confirmation.lower() == "да" else False
+
+    # Формируем запрос для проверки существующей сессии
+    query = (
+        select(sessions)
+        .where(
+            sessions.c.email == email,
+            sessions.c.date.cast(String).like(f"{date}%"),
+        )
+    )
+    result = await session.execute(query)
+    session_entry = result.first()
+
+    if not session_entry:
+        return {"message": "Сессия не найдена"}
+
+    # Проверка текущего статуса confirmation
+    current_confirmation = session_entry[-2]
+    if current_confirmation:
+        return {"message": "Сессия уже подтверждена"}
+
+
+    # Если 'confirmation' равно "нет", обновляем поле в базе данных
+    if not confirmation_bool:
+        update_query = (
+            update(sessions)
+            .where(
+                sessions.c.email == email,
+                sessions.c.date.cast(String).like(f"{date}%"),
+            )
+            .values(confirmation=True, target=1)
+        )
+        await session.execute(update_query)
+        await session.commit()
+        return {"message": "Сессия была обновлена и подтверждена"}
+
+    return {"message": "Мы рады, что помогли вам"}
+
 
 @app.get("/protected-route")
 def protected_route(users: Users = Depends(current_user)):

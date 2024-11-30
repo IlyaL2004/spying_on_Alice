@@ -4,6 +4,9 @@ from sklearn.linear_model import LogisticRegression
 import numpy as np
 import os
 from ml_model.preprocessing import preprocess_with_input
+import pandas as pd
+from sqlalchemy import create_engine
+from config import DB_USER, DB_PASS, DB_HOST, DB_PORT, DB_NAME
 
 model_path_1 = "C:/Users/79853/Desktop/ptml/spying_on_Alice/ml_model/model_v1.joblib"
 model_path_2 = "C:/Users/79853/Desktop/ptml/spying_on_Alice/ml_model/model_v2.joblib"
@@ -13,7 +16,8 @@ model = None
 
 
 def load_and_preprocess_data():
-    # Загружаем и обрабатываем данные
+
+
     train_df = pd.read_csv("C:/Users/79853/Desktop/ptml/spying_on_Alice/ml_model/train_sessions.csv", index_col="session_id")
     times = ["time%s" % i for i in range(1, 11)]
     train_df[times] = train_df[times].apply(pd.to_datetime)

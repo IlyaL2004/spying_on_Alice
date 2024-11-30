@@ -7,7 +7,7 @@ SMTP_SERVER = "smtp.gmail.com"
 SMTP_PORT = 587
 SENDER_EMAIL = "ilyalarin2021@gmail.com"  # Укажите вашу почту
 SENDER_PASSWORD = "zdqt ylme abwe vnog"  # Укажите пароль к вашей почте
-RECIPIENT_EMAIL = "ilalarin467@gmail.com"  # Кому отправить уведомление
+#RECIPIENT_EMAIL = "ilalarin467@gmail.com"  # Кому отправить уведомление
 
 def send_email(subject: str, body: str, email):
     try:
