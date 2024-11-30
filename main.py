@@ -47,7 +47,7 @@ async def startup_event():
     # Загрузка модели при старте приложения
     load_model()
     # Запускаем фоновую задачу обновления модели
-    start_update_model_task()
+    await start_update_model_task()
 
 
 fastapi_users = FastAPIUsers[Users, int](

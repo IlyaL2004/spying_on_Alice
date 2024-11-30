@@ -5,8 +5,12 @@ import numpy as np
 import os
 from ml_model.preprocessing import preprocess_with_input
 import pandas as pd
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from config import DB_USER, DB_PASS, DB_HOST, DB_PORT, DB_NAME
+import asyncio
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqlalchemy.future import select
+import pandas as pd
 
 model_path_1 = "C:/Users/79853/Desktop/ptml/spying_on_Alice/ml_model/model_v1.joblib"
 model_path_2 = "C:/Users/79853/Desktop/ptml/spying_on_Alice/ml_model/model_v2.joblib"
@@ -15,10 +19,36 @@ standby_model_path = model_path_2
 model = None
 
 
-def load_and_preprocess_data():
+async def load_data_bd():
+    # Асинхронное подключение к базе данных (замените на ваши параметры)
+    DATABASE_URL = f"postgresql+asyncpg://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+
+    # Создание асинхронного движка
+    engine = create_async_engine(DATABASE_URL)
+
+    # SQL-запрос для извлечения данных
+    query = text("""
+    SELECT session_id, time1, site1, time2, site2, time3, site3, 
+           time4, site4, time5, site5, time6, site6, 
+           time7, site7, time8, site8, time9, site9, 
+           time10, site10, target
+    FROM sessions
+    WHERE confirmation = TRUE
+    """)
+    async with engine.connect() as connection:
+        result = await connection.execute(query)
+        # Преобразуем результат в DataFrame
+        df = pd.DataFrame(result.fetchall(), columns=result.keys())
+        return df
+
+async def load_and_preprocess_data():
 
 
-    train_df = pd.read_csv("C:/Users/79853/Desktop/ptml/spying_on_Alice/ml_model/train_sessions.csv", index_col="session_id")
+    train_df = await load_data_bd()
+    print(train_df.head())  # Пример вывода для проверки
+
+
+    #train_df = pd.read_csv("C:/Users/79853/Desktop/ptml/spying_on_Alice/ml_model/train_sessions.csv", index_col="session_id")
     times = ["time%s" % i for i in range(1, 11)]
     train_df[times] = train_df[times].apply(pd.to_datetime)
     train_df = train_df.sort_values(by="time1")
