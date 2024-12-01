@@ -12,7 +12,8 @@ from auth.database import Users, get_async_session
 from auth.menager import get_user_manager
 from auth.schemas import UserRead, UserCreate
 
-from ml_model.model import get_model_prediction_with_input, load_model
+from ml_model.model import get_model_prediction_with_input, load_model, load_and_preprocess_data, train_or_update_model, \
+    save_model
 from ml_model.background_tasks import start_update_model_task
 from send_message_email.send_message import send_email
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -45,7 +46,7 @@ class PredictionInput(BaseModel):
 @app.on_event("startup")
 async def startup_event():
     # Загрузка модели при старте приложения
-    load_model()
+    #load_model()
     # Запускаем фоновую задачу обновления модели
     await start_update_model_task()
 
@@ -95,6 +96,14 @@ async def predict_endpoint(
         users: Users = Depends(current_user),
         session: AsyncSession = Depends(get_async_session)
 ):
+    #X_train = await load_and_preprocess_data()
+    #print(X_train)
+    # Обновляем модель
+    #train_or_update_model(X_train)
+
+    # Сохраняем обновленную модель и переключаем её
+    #save_model()
+    #load_model()
     if not users.subscription_end or users.subscription_end < datetime.utcnow():
         raise HTTPException(status_code=403,
                             detail="Your subscription has expired. Please renew it to access this feature.")
@@ -109,6 +118,7 @@ async def predict_endpoint(
 
     # Получение предсказания модели
     prediction = get_model_prediction_with_input(filtered_data)
+    print(prediction)
     confirmation = prediction == [1]
     print(filtered_data)
     # Запись сессии в базу данных
@@ -136,7 +146,7 @@ async def predict_endpoint(
         "time10": str(filtered_data[20]),
         "site10": str(filtered_data[19]),
         "email": email,
-        "target": prediction[0],
+        "target": prediction,
         "confirmation": confirmation,
         "date": time
     }
@@ -202,11 +212,11 @@ async def check_session(
     return {"message": "Мы рады, что помогли вам"}
 
 
-@app.get("/protected-route")
-def protected_route(users: Users = Depends(current_user)):
-    return f"Hello, {users.username}"
+#@app.get("/protected-route")
+#def protected_route(users: Users = Depends(current_user)):
+#    return f"Hello, {users.username}"
 
 
-@app.get("/unprotected-route")
-def unprotected_route():
-    return f"Hello, anonym"
+#@app.get("/unprotected-route")
+#def unprotected_route():
+#    return f"Hello, anonym"
