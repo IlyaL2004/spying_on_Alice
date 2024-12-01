@@ -1,6 +1,6 @@
 from time import sleep
+import asyncio
 
-from sqlalchemy.connectors import asyncio
 
 from ml_model.model import load_and_preprocess_data, train_or_update_model, save_model, switch_model
 import threading
@@ -19,9 +19,12 @@ async def update_model_task():
 
         # Ждём 60 секунд перед следующим обновлением
         print("dsdsdsdssd")
-        sleep(900)
+        await asyncio.sleep(900)
         print("asasa")
+
 
 async def start_update_model_task():
     #threading.Thread(target=update_model_task, daemon=True).start()
-    asyncio.create_task(await update_model_task())
+    asyncio.create_task(update_model_task())
+
+

@@ -118,8 +118,11 @@ async def predict_endpoint(
 
     # Получение предсказания модели
     prediction = get_model_prediction_with_input(filtered_data)
+    print("fdfffffffffffffdfd")
     print(prediction)
-    confirmation = prediction == [1]
+    confirmation = True
+    if prediction == 1:
+        confirmation = False
     print(filtered_data)
     # Запись сессии в базу данных
     time = datetime.utcnow()
@@ -203,7 +206,7 @@ async def check_session(
                 sessions.c.email == email,
                 sessions.c.date.cast(String).like(f"{date}%"),
             )
-            .values(confirmation=True, target=1)
+            .values(confirmation=True, target=0)
         )
         await session.execute(update_query)
         await session.commit()

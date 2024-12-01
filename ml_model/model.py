@@ -20,8 +20,8 @@ from sklearn.feature_extraction.text import CountVectorizer
 from catboost import CatBoostClassifier, Pool
 
 
-model_path_1 = "C:/Users/79853/Desktop/ptml/spying_on_Alice/ml_model/model_v1.cbm"
-model_path_2 = "C:/Users/79853/Desktop/ptml/spying_on_Alice/ml_model/model_v2.cbm"
+model_path_1 = "C:/Users/79853/Desktop/ptml/spying_on_Alice/ml_model/model_v11.cbm"
+model_path_2 = "C:/Users/79853/Desktop/ptml/spying_on_Alice/ml_model/model_v21.cbm"
 active_model_path = model_path_1
 standby_model_path = model_path_2
 model = None
