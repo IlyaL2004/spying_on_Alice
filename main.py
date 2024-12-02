@@ -104,9 +104,10 @@ async def predict_endpoint(
     # Сохраняем обновленную модель и переключаем её
     #save_model()
     #load_model()
-    if not users.subscription_end or users.subscription_end < datetime.utcnow():
-        raise HTTPException(status_code=403,
-                            detail="Your subscription has expired. Please renew it to access this feature.")
+    if not users.is_superuser:
+        if not users.subscription_end or users.subscription_end < datetime.utcnow():
+            raise HTTPException(status_code=403,
+                                detail="Your subscription has expired. Please renew it to access this feature.")
 
     # Извлечение email из входных данных
     email = next((value for value in input_data.list_values if isinstance(value, str) and "@" in value), None)
