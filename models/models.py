@@ -47,3 +47,31 @@ sessions = Table(
     Column("confirmation", Boolean, nullable=True),
     Column("date", TIMESTAMP, default=datetime.utcnow, nullable=True),
 )
+
+
+start_sessions = Table(
+    "start_sessions",
+    metadata,
+    Column("session_id", Integer, primary_key=True),
+    Column("site1", String, nullable=True),
+    Column("time1", String, nullable=True),
+    Column("site2", String, nullable=True),
+    Column("time2", String, nullable=True),
+    Column("site3", String, nullable=True),
+    Column("time3", String, nullable=True),
+    Column("site4", String, nullable=True),
+    Column("time4", String, nullable=True),
+    Column("site5", String, nullable=True),
+    Column("time5", String, nullable=True),
+    Column("site6", String, nullable=True),
+    Column("time6", String, nullable=True),
+    Column("site7", String, nullable=True),
+    Column("time7", String, nullable=True),
+    Column("site8", String, nullable=True),
+    Column("time8", String, nullable=True),
+    Column("site9", String, nullable=True),
+    Column("time9", String, nullable=True),
+    Column("site10", String, nullable=True),
+    Column("time10", String, nullable=True),
+    Column("target", Integer, nullable=True),
+)

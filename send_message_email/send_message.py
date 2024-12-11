@@ -1,12 +1,13 @@
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from config import MY_EMAIL, MY_PASS_EMAIL
 
 # Конфигурация SMTP сервера
 SMTP_SERVER = "smtp.gmail.com"
 SMTP_PORT = 587
-SENDER_EMAIL = "ilyalarin2021@gmail.com"  # Укажите вашу почту
-SENDER_PASSWORD = "zdqt ylme abwe vnog"  # Укажите пароль к вашей почте
+SENDER_EMAIL = MY_EMAIL  # Укажите вашу почту
+SENDER_PASSWORD = MY_PASS_EMAIL  # Укажите пароль к вашей почте
 #RECIPIENT_EMAIL = "ilalarin467@gmail.com"  # Кому отправить уведомление
 
 def send_email(subject: str, body: str, email):
