@@ -20,8 +20,9 @@ from sklearn.feature_extraction.text import CountVectorizer
 from catboost import CatBoostClassifier, Pool
 
 
-model_path_1 = "C:/Users/79853/Desktop/ptml/spying_on_Alice/ml_model/model_v11.cbm"
-model_path_2 = "C:/Users/79853/Desktop/ptml/spying_on_Alice/ml_model/model_v21.cbm"
+#model_path_1 = "C:/Users/79853/Desktop/ptml/spying_on_Alice/ml_model/model_v11.cbm"
+model_path_1 = "./model_v11.cbm"
+model_path_2 = "./model_v21.cbm"
 active_model_path = model_path_1
 standby_model_path = model_path_2
 model = None
@@ -36,7 +37,7 @@ async def load_data_bd():
 
     # Создание асинхронного движка
     engine = create_async_engine(DATABASE_URL)
-
+    print(11111111111111111)
     # SQL-запрос для извлечения данных
     query = text("""
     SELECT session_id, time1, site1, time2, site2, time3, site3, 
@@ -56,6 +57,7 @@ async def load_data_bd():
         result = await connection.execute(query)
         # Преобразуем результат в DataFrame
         df = pd.DataFrame(result.fetchall(), columns=result.keys())
+        print(f"X_train shape: {df.shape}")
         return df
 
 

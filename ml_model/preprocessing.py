@@ -24,6 +24,13 @@ def preprocess_with_input(list_values) -> csr_matrix:
     ]
 
     # Преобразование списка значений в DataFrame
+
+    target_length = 21
+
+    # Проверка текущей длины и дополнение нулями
+    if len(list_values) < target_length:
+        list_values.extend([0] * (target_length - len(list_values)))
+
     data = [list_values]
     test_df = pd.DataFrame(data, columns=columns)
 

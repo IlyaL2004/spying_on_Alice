@@ -125,30 +125,31 @@ async def predict_endpoint(
     if prediction == 1:
         confirmation = False
     print(filtered_data)
+    filtered_data = [None if value == 0 else str(value) for value in filtered_data]
     # Запись сессии в базу данных
     time = datetime.utcnow()
     session_data = {
         "user_id": users.id,
-        "time1": str(filtered_data[2]),
-        "site1": str(filtered_data[1]),
-        "time2": str(filtered_data[4]),
-        "site2": str(filtered_data[3]),
-        "time3": str(filtered_data[6]),
-        "site3": str(filtered_data[5]),
-        "time4": str(filtered_data[8]),
-        "site4": str(filtered_data[7]),
-        "time5": str(filtered_data[10]),
-        "site5": str(filtered_data[9]),
-        "time6": str(filtered_data[12]),
-        "site6": str(filtered_data[11]),
-        "time7": str(filtered_data[14]),
-        "site7": str(filtered_data[13]),
-        "time8": str(filtered_data[16]),
-        "site8": str(filtered_data[15]),
-        "time9": str(filtered_data[18]),
-        "site9": str(filtered_data[17]),
-        "time10": str(filtered_data[20]),
-        "site10": str(filtered_data[19]),
+        "time1": filtered_data[2],
+        "site1": filtered_data[1],
+        "time2": filtered_data[4],
+        "site2": filtered_data[3],
+        "time3": filtered_data[6],
+        "site3": filtered_data[5],
+        "time4": filtered_data[8],
+        "site4": filtered_data[7],
+        "time5": filtered_data[10],
+        "site5": filtered_data[9],
+        "time6": filtered_data[12],
+        "site6": filtered_data[11],
+        "time7": filtered_data[14],
+        "site7": filtered_data[13],
+        "time8": filtered_data[16],
+        "site8": filtered_data[15],
+        "time9": filtered_data[18],
+        "site9": filtered_data[17],
+        "time10": filtered_data[20],
+        "site10": filtered_data[19],
         "email": email,
         "target": prediction,
         "confirmation": confirmation,
@@ -237,3 +238,4 @@ async def check_session(
 #@app.get("/unprotected-route")
 #def unprotected_route():
 #    return f"Hello, anonym"
+
