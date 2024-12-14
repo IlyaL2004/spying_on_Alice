@@ -15,6 +15,8 @@ users = Table(
     Column("is_superuser", Boolean, default=False, nullable=False),
     Column("is_verified", Boolean, default=False, nullable=False),
     Column("subscription_end", TIMESTAMP, nullable=True),
+    Column("payment_id", String, nullable=True),
+    Column("payment_confirmation", Boolean, default=False),
 )
 
 sessions = Table(
