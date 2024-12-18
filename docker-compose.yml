@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - app_network
+
+  parser_service:
+    build: ./parser_service
+    container_name: parser_service
+    ports:
+      - "8001:8001"
+    depends_on:
+      - rabbitmq
+    networks:
+      - app_network
+
+  google_sites:
+    build: ./google_sites
+    container_name: google_sites
+    depends_on:
+      - rabbitmq
+    ports:
+      - "5000:5000"
+    networks:
+      - app_network
+
+  yandex_sites:
+    build: ./yandex_sites
+    container_name: yandex_sites
+    depends_on:
+      - rabbitmq
+    ports:
+      - "5001:5001"
+    networks:
+      - app_network
+
+networks:
+  app_network:
+    driver: bridge
+
+
