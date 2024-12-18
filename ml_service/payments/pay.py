@@ -1,4 +1,4 @@
-from sqlalchemy.ext.asyncio import AsyncSession
+"""from sqlalchemy.ext.asyncio import AsyncSession
 from auth.database import get_async_session, Users
 from yookassa import Configuration, Payment
 from fastapi import APIRouter, Depends, HTTPException
@@ -109,7 +109,7 @@ async def payment_success(
     return {"message": "Subscription activated for 30 days!"}
 
 
-
+"""
 
 """@app.post("/create-auto-payment")
 async def create_auto_payment(

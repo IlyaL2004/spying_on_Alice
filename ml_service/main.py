@@ -30,11 +30,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from auth.database import Users
 from datetime import datetime, timedelta
 
-from payments.pay import router as payments_router
+#from payments.pay import router as payments_router
 # Настройки RabbitMQ
 RABBITMQ_HOST = 'localhost'
 NEW_QUEUE_NAME = 'new_visits_queue'
-#Configuration.configure("996855", "test_Ea50FMw71gvcGgq-WGXcbmn74hCZCxm7DIC0jN9tvUw")
+Configuration.configure("996855", "test_Ea50FMw71gvcGgq-WGXcbmn74hCZCxm7DIC0jN9tvUw")
 
 # Функция для получения subscription_end по id пользователя
 async def get_subscription_end(user_id: int) -> datetime:
@@ -47,7 +47,7 @@ async def get_subscription_end(user_id: int) -> datetime:
 app = FastAPI(
     title="App"
 )
-app.include_router(payments_router)
+#app.include_router(payments_router)
 # Модель данных для ввода list_values
 class PredictionInput(BaseModel):
     list_values: List[Union[int, float, str]]
@@ -342,7 +342,7 @@ async def check_session(
 
     return {"message": "Мы рады, что помогли вам"}
 
-"""
+
 @app.post("/create-payment")
 async def create_payment(
     user: Users = Depends(current_user),
@@ -428,7 +428,7 @@ async def payment_success(
     )
     await session.commit()
 
-    return {"message": "Subscription activated for 30 days!"}"""
+    return {"message": "Subscription activated for 30 days!"}
 
 
 
