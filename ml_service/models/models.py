@@ -4,7 +4,7 @@ from sqlalchemy import MetaData, Table, Column, Integer, String, TIMESTAMP, Fore
 metadata = MetaData()
 
 users = Table(
-    "users",
+    "user",
     metadata,
     Column("id", Integer, primary_key=True),
     Column("email", String, nullable=False),

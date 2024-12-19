@@ -24,7 +24,8 @@ import threading
 from yookassa import Configuration
 from fastapi import APIRouter, Depends, HTTPException
 from yookassa import Payment
-
+from config import YOOKASSA_KEY
+from config import YOOKASSA_SHOP_ID
 from auth.database import get_async_session
 from sqlalchemy.ext.asyncio import AsyncSession
 from auth.database import Users
@@ -34,7 +35,7 @@ from datetime import datetime, timedelta
 # Настройки RabbitMQ
 RABBITMQ_HOST = 'localhost'
 NEW_QUEUE_NAME = 'new_visits_queue'
-Configuration.configure("996855", "test_Ea50FMw71gvcGgq-WGXcbmn74hCZCxm7DIC0jN9tvUw")
+Configuration.configure(YOOKASSA_SHOP_ID, YOOKASSA_KEY)
 
 # Функция для получения subscription_end по id пользователя
 async def get_subscription_end(user_id: int) -> datetime:
@@ -215,6 +216,7 @@ async def predict_endpoint(
     await session.execute(insert(sessions).values(session_data))
     await session.commit()
     # Отправка уведомления при предсказании 0
+    print(confirmation)
     if not confirmation:
         subject = "Model Alert"
         body = f"На вашем аккаунте выполнены подозрительные действия. Вам следует сменить пароль. Помогите нам лучше распознавать подозрительные действия, перейдите по сыслке ""http://127.0.0.1:8000/docs#/default/check_session_check_session_get"" введите свою почту, это время " + str(time) + " и если вы согласны с предсказание введидте да, если не согласны, то введите нет"
@@ -275,7 +277,7 @@ async def predict_endpoint_auto(
 
     await session.execute(insert(sessions).values(session_data))
     await session.commit()
-
+    print(confirmation)
     # Отправка уведомления при предсказании 0
     if not confirmation:
         subject = "Model Alert"
@@ -373,7 +375,7 @@ async def create_payment(
         new_confirmation = False
         # Обновляем last_payment_id в таблице users
         await session.execute(
-            text("UPDATE users SET payment_id = :payment_id, payment_confirmation= :val WHERE id = :user_id"),
+            text("UPDATE \"user\" SET payment_id = :payment_id, payment_confirmation= :val WHERE id = :user_id"),
             {"payment_id": payment.id, "user_id": user.id, "val": new_confirmation}
         )
         await session.commit()
@@ -391,7 +393,7 @@ async def payment_success(
     user: Users = Depends(current_user),
 ):
     result = await session.execute(
-        text("SELECT payment_confirmation FROM users WHERE id = :user_id"),
+        text("SELECT payment_confirmation FROM \"user\" WHERE id = :user_id"),
         {"user_id": user.id}
     )
     confirmation = result.scalar_one_or_none()
@@ -400,10 +402,11 @@ async def payment_success(
         return {"message": "Payment not completed."}
         # Получаем информацию о платеже из YooKassa
     result = await session.execute(
-        text("SELECT payment_id FROM users WHERE id = :user_id"),
+        text("SELECT payment_id FROM \"user\" WHERE id = :user_id"),
         {"user_id": user.id}
     )
     payment_id = result.scalar_one_or_none()
+
     if payment_id == None:
         return {"message": "Payment not completed successfully."}
     payment = Payment.find_one(payment_id)
@@ -423,7 +426,7 @@ async def payment_success(
     confirmation = True
 
     await session.execute(
-        text("UPDATE users SET payment_confirmation = :payment WHERE id = :user_id"),
+        text("UPDATE \"user\" SET payment_confirmation = :payment WHERE id = :user_id"),
         {"payment": confirmation, "user_id": user.id}
     )
     await session.commit()
