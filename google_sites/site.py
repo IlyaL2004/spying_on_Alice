@@ -37,7 +37,7 @@ DATA_FILE = 'visits.json'
 
 # Словарь для соответствия user_id и почты
 USER_EMAILS = {
-    "ba150f6d-ef31-4eba-9e70-2f846bcdc56a": "ilyalarin2021@gmail.com",
+    "c5c7c8cc-a7c1-4655-ad34-5ec7416f1971": "ilyalarin2021@gmail.com",
     "67a86189-eede-4d71-8166-07db226ac145": "ilalarin467@gmail.com",
 }
 
