@@ -43,6 +43,7 @@ DATA_FILE = 'visits.json'
 USER_EMAILS = {
     "ac6d5844-f8c7-4715-91ab-a628c8462c70": "ilyalarin2021@gmail.com",
     "67a86189-eede-4d71-8166-07db226ac145": "ilalarin467@gmail.com",
+    "31bffd61-ee5d-4636-8d28-349c0b43d499": "mishazhadnov@yandex.ru",
 }
 
 def load_visits():

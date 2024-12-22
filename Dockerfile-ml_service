@@ -16,6 +16,8 @@ RUN apt-get update && apt-get install -y postgresql-client && rm -rf /var/lib/ap
 
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
 
-# RUN alembic upgrade head
+
+# alembic revision --autogenerate -m "init"
+# alembic upgrade head
 # psql --username=alice --host=postgres --dbname=alice -c "\copy start_sessions(session_id, site1, time1, site2, time2, site3, time3, site4, time4, site5, time5, site6, time6, site7, time7, site8, time8, site9, time9, site10, time10, target) FROM './train_sessions.csv' DELIMITER ',' CSV HEADER;" 
 # and password->                  alice

@@ -199,6 +199,20 @@ def background_log_checker():
         sleep(15)  # Интервал проверки (60 секунд)
 
 
+# start_rabbitMQ = False
+
+# while not start_rabbitMQ:
+#     try:
+#         # Запуск потребителя RabbitMQ в отдельном потоке
+#         threading.Thread(target=consume_from_rabbitmq, daemon=True).start()
+#         # Запуск фоновой проверки логов в отдельном потоке
+#         threading.Thread(target=background_log_checker, daemon=True).start()
+#         start_rabbitMQ = True
+#     except:
+#         time.sleep(60)
+
+
+# time.sleep(200) #(?)
 # Запуск потребителя RabbitMQ в отдельном потоке
 threading.Thread(target=consume_from_rabbitmq, daemon=True).start()
 # Запуск фоновой проверки логов в отдельном потоке

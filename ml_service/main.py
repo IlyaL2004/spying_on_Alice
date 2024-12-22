@@ -12,6 +12,7 @@ from payments.pay import router as payments_router
 from predict_and_confirmation_predict.predict_and_confirmation import predict_and_confirmation_router
 from queues.queues import run_event_loop
 from queues.queues import consume_from_rabbitmq
+import time
 
 app = FastAPI(
     title="App"
@@ -45,10 +46,25 @@ app.include_router(
 
 current_user = fastapi_users.current_user()
 
+# start_rabbitMQ = False
+
+# while not start_rabbitMQ:
+#     try:
+#         # Запускаем цикл событий в отдельном потоке
+#         threading.Thread(target=run_event_loop, daemon=True).start()
+
+#         # Запуск потребителя RabbitMQ в отдельном потоке
+#         threading.Thread(target=consume_from_rabbitmq, daemon=True).start()
+
+#         start_rabbitMQ = True
+#     except:
+#         time.sleep(60)
+
+
+# time.sleep(200) #(?)
+
 # Запускаем цикл событий в отдельном потоке
 threading.Thread(target=run_event_loop, daemon=True).start()
 
 # Запуск потребителя RabbitMQ в отдельном потоке
 threading.Thread(target=consume_from_rabbitmq, daemon=True).start()
-
-

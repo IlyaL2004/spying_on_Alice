@@ -1,5 +1,3 @@
-
-
 from pydantic import BaseModel
 from typing import List, Union
 from sqlalchemy import insert, String, text
@@ -89,7 +87,6 @@ def callback(ch, method, properties, body):
 
 # Функция для подключения к RabbitMQ и запуска потребителя
 def consume_from_rabbitmq():
-    time.sleep(20)
     connection = pika.BlockingConnection(pika.ConnectionParameters(RABBITMQ_HOST))
     channel = connection.channel()
     channel.queue_declare(queue=NEW_QUEUE_NAME)
