@@ -1,0 +1,23 @@
+FROM python:3.11
+
+# ARG DB_USER
+# ARG DB_NAME
+
+WORKDIR /app
+
+COPY ./.env .
+COPY ./ml_service/ .
+RUN mkdir -p ./migrations/versions
+
+
+RUN pip install --upgrade pip
+RUN pip install -r requirements.txt
+RUN apt-get update && apt-get install -y postgresql-client && rm -rf /var/lib/apt/lists/*
+
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+
+
+# alembic revision --autogenerate -m "init"
+# alembic upgrade head
+# psql --username=alice --host=postgres --dbname=alice -c "\copy start_sessions(session_id, site1, time1, site2, time2, site3, time3, site4, time4, site5, time5, site6, time6, site7, time7, site8, time8, site9, time9, site10, time10, target) FROM './train_sessions.csv' DELIMITER ',' CSV HEADER;" 
+# and password->                  alice
