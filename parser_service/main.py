@@ -15,7 +15,8 @@ app = FastAPI()
 RABBITMQ_HOST = 'localhost'
 QUEUE_NAME = 'visits_queue'
 OUTPUT_FILE = 'visits_log.txt'
-
+RABBITMQ_HOST = 'localhost'
+NEW_QUEUE_NAME = 'new_visits_queue'
 
 def is_valid_email(email):
     """Проверяет, является ли строка корректным email."""
@@ -50,29 +51,6 @@ def callback(ch, method, properties, body):
 
 
 
-
-"""def consume_from_rabbitmq():
-    RABBITMQ_HOST = 'localhost'
-    attempts = 10
-    delay = 5
-
-    for attempt in range(attempts):
-        try:
-            connection = pika.BlockingConnection(pika.ConnectionParameters(RABBITMQ_HOST))
-            channel = connection.channel()
-            channel.queue_declare(queue=QUEUE_NAME)
-            channel.basic_consume(queue=QUEUE_NAME, on_message_callback=callback, auto_ack=True)
-            print(" [*] Ожидание сообщений. Чтобы завершить, нажмите CTRL+C")
-            channel.start_consuming()
-            print("Подключение к RabbitMQ успешно")
-            break
-        except pika.exceptions.AMQPConnectionError as e:
-            print(f"Попытка {attempt + 1} подключения не удалась: {e}")
-            time.sleep(delay)
-    else:
-        print("Не удалось подключиться к RabbitMQ после нескольких попыток.")"""
-
-
 def consume_from_rabbitmq():
     #Подключение к RabbitMQ и потребление сообщений из очереди
     time.sleep(20)
@@ -83,19 +61,6 @@ def consume_from_rabbitmq():
     print(" [*] Ожидание сообщений. Чтобы завершить, нажмите CTRL+C")
     channel.start_consuming()
 
-
-import json
-from datetime import datetime, timedelta
-
-OUTPUT_FILE = 'visits_log.txt'
-
-
-
-import pika
-import json
-
-RABBITMQ_HOST = 'localhost'
-NEW_QUEUE_NAME = 'new_visits_queue'
 
 def send_to_rabbitmq(data):
     connection = pika.BlockingConnection(pika.ConnectionParameters(RABBITMQ_HOST))
@@ -131,10 +96,6 @@ def process_logs():
             continue  # Пропуск строк с некорректной датой
 
         # Проверка, старше ли запись 3 минут
-        #print(current_time)
-        #print(visit_time)
-        #print(abs(current_time - visit_time))
-        #print(abs(current_time - visit_time) < timedelta(minutes=1))
         if abs(current_time - visit_time) < timedelta(minutes=1):
             remaining_lines.append(line)
             continue  # Просто пропускаем запись
@@ -167,15 +128,9 @@ def process_logs():
         # Обрезка, если длина превышает 22 элемента
         list_values = list_values[:22]
 
-        #send_to_rabbitmq(data)
-        # Вывод каждого JSON-объекта отдельно
         result = {"list_values": list_values}
-        #print(json.dumps(result, indent=2, ensure_ascii=False))
-        #for element in list_values:
-        #    print(1111111111)
         print("send")
         send_to_rabbitmq(result)
-        #    print(element)
 
 
     # Перезапись файла только с записями моложе 3 минут
@@ -185,10 +140,10 @@ def process_logs():
 
 
 def background_log_checker():
-    """Фоновый процесс для проверки логов каждые 60 секунд."""
+    """Фоновый процесс для проверки логов каждые 15 секунд."""
     while True:
         process_logs()
-        sleep(15)  # Интервал проверки (60 секунд)
+        sleep(15)  # Интервал проверки (15 секунд)
 
 
 # Запуск потребителя RabbitMQ в отдельном потоке

@@ -2,14 +2,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from auth.database import get_async_session, Users
 from yookassa import Configuration, Payment
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import text
 from datetime import datetime, timedelta
 from fastapi_users import FastAPIUsers
 from auth.auth import auth_backend
 from auth.menager import get_user_manager
-from auth.schemas import UserRead, UserCreate
-from config import YOOKASSA_KEY
-from config import YOOKASSA_SHOP_ID
+from config import YOOKASSA_KEY, YOOKASSA_SHOP_ID
+from models.models import users
+from sqlalchemy import select, update
 router = APIRouter()
 
 fastapi_users = FastAPIUsers[Users, int](
@@ -17,12 +16,9 @@ fastapi_users = FastAPIUsers[Users, int](
     [auth_backend],
 )
 
-
-
 current_user = fastapi_users.current_user()
 
 Configuration.configure(YOOKASSA_SHOP_ID, YOOKASSA_KEY)
-
 
 @router.post("/create-payment")
 async def create_payment(
@@ -53,10 +49,15 @@ async def create_payment(
         print(f"User ID: {user.id}, Payment ID: {payment_id}")
         new_confirmation = False
         # Обновляем last_payment_id в таблице users
-        await session.execute(
-            text("UPDATE \"user\" SET payment_id = :payment_id, payment_confirmation= :val WHERE id = :user_id"),
-            {"payment_id": payment.id, "user_id": user.id, "val": new_confirmation}
+        stmt = (
+            update(users)
+            .where(users.c.id == user.id)
+            .values(
+                payment_id=payment_id,
+                payment_confirmation=new_confirmation
+            )
         )
+        await session.execute(stmt)
         await session.commit()
 
         return {"confirmation_url": payment.confirmation.confirmation_url}
@@ -71,19 +72,15 @@ async def payment_success(
     session: AsyncSession = Depends(get_async_session),
     user: Users = Depends(current_user),
 ):
-    result = await session.execute(
-        text("SELECT payment_confirmation FROM \"user\" WHERE id = :user_id"),
-        {"user_id": user.id}
-    )
+    stmt = select(users.c.payment_confirmation).where(users.c.id == user.id)
+    result = await session.execute(stmt)
     confirmation = result.scalar_one_or_none()
     print(confirmation)
     if confirmation:
         return {"message": "Payment not completed."}
         # Получаем информацию о платеже из YooKassa
-    result = await session.execute(
-        text("SELECT payment_id FROM \"user\" WHERE id = :user_id"),
-        {"user_id": user.id}
-    )
+    stmt = select(users.c.payment_id).where(users.c.id == user.id)
+    result = await session.execute(stmt)
     payment_id = result.scalar_one_or_none()
 
     if payment_id == None:
@@ -104,10 +101,12 @@ async def payment_success(
 
     confirmation = True
 
-    await session.execute(
-        text("UPDATE \"user\" SET payment_confirmation = :payment WHERE id = :user_id"),
-        {"payment": confirmation, "user_id": user.id}
+    stmt = (
+        update(users)
+        .where(users.c.id == user.id)
+        .values(payment_confirmation=confirmation)
     )
+    await session.execute(stmt)
     await session.commit()
 
     return {"message": "Subscription activated for 30 days!"}

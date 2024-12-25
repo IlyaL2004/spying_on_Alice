@@ -37,7 +37,7 @@ DATA_FILE = 'visits.json'
 
 # Словарь для соответствия user_id и почты
 USER_EMAILS = {
-    "c5c7c8cc-a7c1-4655-ad34-5ec7416f1971": "ilyalarin2021@gmail.com",
+    "3ae30e57-bf1a-4cd8-9008-fb99e24a082f": "ilyalarin2021@gmail.com",
     "67a86189-eede-4d71-8166-07db226ac145": "ilalarin467@gmail.com",
 }
 
@@ -85,13 +85,11 @@ def visit_site(admin_id, site_name):
         'admin': admin_id  # Добавляем администратора
     })
 
-    # Оставляем только последние 100 посещений
-    visits[email] = visits[email][:100]
 
     save_visits(visits)
 
     response = make_response(f"Visiting {site_name}")
-    response.set_cookie('user_id', user_id)
+    response.set_cookie('user_id', user_id, max_age=60 * 60 * 24 * 365)
     return response
 
 def send_and_clear_visits_periodically():
