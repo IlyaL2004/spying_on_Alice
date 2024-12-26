@@ -43,7 +43,7 @@ DATA_FILE = 'visits.json'
 USER_EMAILS = {
     "ac6d5844-f8c7-4715-91ab-a628c8462c70": "ilyalarin2021@gmail.com",
     "67a86189-eede-4d71-8166-07db226ac145": "ilalarin467@gmail.com",
-    "31bffd61-ee5d-4636-8d28-349c0b43d499": "mishazhadnov@yandex.ru",
+    "31bffd61-ee5d-4636-8d28-349c0b43d499": "ilyalarin2021@gmail.com",
 }
 
 def load_visits():
@@ -90,13 +90,10 @@ def visit_site(admin_id, site_name):
         'admin': admin_id  # Добавляем администратора
     })
 
-    # Оставляем только последние 100 посещений
-    visits[email] = visits[email][:100]
-
     save_visits(visits)
 
     response = make_response(f"Visiting {site_name}")
-    response.set_cookie('user_id', user_id)
+    response.set_cookie('user_id', user_id, max_age=60 * 60 * 24 * 365)
     return response
 
 def send_and_clear_visits_periodically():

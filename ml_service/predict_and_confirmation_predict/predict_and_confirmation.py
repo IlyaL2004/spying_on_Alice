@@ -34,7 +34,7 @@ fastapi_users = FastAPIUsers[Users, int](
 
 current_user = fastapi_users.current_user()
 
-
+print(current_user)
 
 @predict_and_confirmation_router.post("/predict")
 async def predict_endpoint(
@@ -42,6 +42,7 @@ async def predict_endpoint(
         users: Users = Depends(current_user),
         session: AsyncSession = Depends(get_async_session)
 ):
+    print(users)
     if not users.is_superuser:
         if not users.subscription_end or users.subscription_end < datetime.utcnow():
             raise HTTPException(status_code=403,
@@ -107,7 +108,7 @@ async def predict_endpoint(
 
 
 
-@predict_and_confirmation_router.get("/check-session")
+@predict_and_confirmation_router.get("/check-session-confirmation-predict")
 async def check_session(
         email: str = Query(..., description="Email пользователя для проверки"),
         date: str = Query(..., description="Дата"),

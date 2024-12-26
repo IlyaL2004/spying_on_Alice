@@ -20,7 +20,6 @@ class UserManager(IntegerIDMixin, BaseUserManager[Users, int]):
             request: Optional[Request] = None,
     ) -> models.UP:
         await self.validate_password(user_create.password, user_create)
-        print(33333333)
         existing_user = await self.user_db.get_by_email(user_create.email)
         if existing_user is not None:
             raise exceptions.UserAlreadyExists()
@@ -32,7 +31,6 @@ class UserManager(IntegerIDMixin, BaseUserManager[Users, int]):
         )
         password = user_dict.pop("password")
         user_dict["hashed_password"] = self.password_helper.hash(password)
-        print(1111111111111111)
         created_user = await self.user_db.create(user_dict)
 
         await self.on_after_register(created_user, request)

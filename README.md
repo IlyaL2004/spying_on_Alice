@@ -4,9 +4,17 @@
 
 ### Состав команды
 
+| ФИО | Должность |
+| - | - |
+| Ларин Илья Андреевич | TeamLead, BackEnd |
+| Мошенский Андрей Александрович | ML |
+| Коломытцева Екатерина Андреевна | ML |
+| Титкова Ольга Алексеевна | BackEnd |
+| Жаднов Михаил Денисович | DevOps |
+
 ### Запуск проекта
 
-#### Подготовка
+<!-- #### Подготовка
 
 Для запуска проекта нужно в клонированном репозитории создать .env файл, поместить его в корне проекта (к docker compose файлу), прописать в нем следующие переменные:
 
@@ -32,9 +40,9 @@
 
 Также нужно предоставить обучающие данные в формате .csv, поместив их в ml_service
 
-#### Запуск
+#### Запуск -->
 
-+ Из корня проекта запустить команду `docker compose up` (если не прокатило docker compose, то заменить на docker-compose)
++ Запустить команду `docker compose up` (если не прокатило docker compose, то заменить на docker-compose)
 
 + Далее ждете минуты 4-7  
 
@@ -43,6 +51,6 @@
   + `alembic upgrade head`
   + `psql --username=DB_USER --host=DB_HOST --dbname=DB_NAME -c "\copy start_sessions(session_id, site1, time1, site2, time2, site3, time3, site4, time4, site5, time5, site6, time6, site7, time7, site8, time8, site9, time9, site10, time10, target) FROM './train_sessions.csv' DELIMITER ',' CSV HEADER;"`, затем ввести пароль от своей бд
 
-+ После этого нужно перезапустить контейнеры с ml_service и parser_service (если позже добавим healthcheck на rabbitmq, то можно будет это вычеркнуть)
+<!-- + После этого нужно перезапустить контейнеры с ml_service и parser_service (если позже добавим healthcheck на rabbitmq, то можно будет это вычеркнуть) -->
 
-Теперь можно пользоваться, наверное...
+<!-- Теперь можно пользоваться, наверное... -->

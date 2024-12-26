@@ -1,37 +1,17 @@
 from pydantic import BaseModel
 from typing import List, Union
-from sqlalchemy import insert, String, text
-from fastapi_users import FastAPIUsers
-from auth.auth import auth_backend
-from auth.menager import get_user_manager
-from auth.schemas import UserRead, UserCreate
-from ml_model.background_tasks import start_update_model_task
-from send_message_email.send_message import send_email
-from fastapi import FastAPI, Query, Depends, HTTPException
-from sqlalchemy import update
-from sqlalchemy.types import String
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from auth.database import Users
 import pika
 import json
-from ml_model.model import get_model_prediction_with_input
-from sqlalchemy import insert
-from auth.database import get_async_session
-from models.models import sessions
 import asyncio
-
 from fastapi import APIRouter, Depends, HTTPException
-from yookassa import Payment
-from config import YOOKASSA_KEY
-from config import YOOKASSA_SHOP_ID
 from config import RABBITMQ_HOST, NEW_QUEUE_NAME
 from auth.database import get_async_session
 from auth.database import Users
-from datetime import datetime, timedelta
+from datetime import datetime
 from predict_and_confirmation_predict.predict_auto import predict_endpoint_auto
+from models.models import users
 import time
-from time import sleep
 
 class PredictionInput(BaseModel):
     list_values: List[Union[int, float, str]]
@@ -45,7 +25,7 @@ def run_event_loop():
 
 async def get_subscription_end(user_id: int) -> datetime:
     async for session in get_async_session():
-        result = await session.execute(select(Users.subscription_end).where(Users.id == user_id))
+        result = await session.execute(select(users.c.subscription_end).where(users.c.id == user_id))
         subscription_end = result.scalar()
         return subscription_end
 

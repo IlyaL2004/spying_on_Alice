@@ -2,11 +2,9 @@ import pandas as pd
 from scipy.sparse import csr_matrix, hstack
 from sklearn.feature_extraction.text import CountVectorizer
 from catboost import CatBoostClassifier, Pool
+from ml_model import config_value
 
 def preprocess_with_input(list_values) -> csr_matrix:
-    from ml_model.model import train_sites
-    from ml_model.model import scaler
-    from ml_model.model import idx_split
     # Названия столбцов
     columns = [
         "session_id", "site1", "time1", "site2", "time2", "site3", "time3",
@@ -45,7 +43,7 @@ def preprocess_with_input(list_values) -> csr_matrix:
 
     # Объединение данных
 
-    all_sites = pd.concat([train_sites, test_sites])
+    all_sites = pd.concat([config_value.train_sites, test_sites])
 
     # Создание векторизатора
     vectorizer = CountVectorizer()
@@ -53,11 +51,11 @@ def preprocess_with_input(list_values) -> csr_matrix:
 
     # Масштабирование новых признаков
     dense_features = ['day_of_week', 'hour', 'session_duration']
-    full_dense_features = scaler.transform(
+    full_dense_features = config_value.scaler.transform(
         test_df[dense_features])  # scaler должна браться из обучения как глобальная переменная
 
     # Разделение обратно на тренировочные и тестовые наборы
-    idxx_split = idx_split  # эта строка должна храниться как глобальная переменная
+    idxx_split = config_value.idx_split  # эта строка должна храниться как глобальная переменная
     X_test_sparse = full_sites_sparse[idxx_split:]
 
     X_test_dense = full_dense_features  # может быть проблема

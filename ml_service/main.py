@@ -12,6 +12,25 @@ from payments.pay import router as payments_router
 from predict_and_confirmation_predict.predict_and_confirmation import predict_and_confirmation_router
 from queues.queues import run_event_loop
 from queues.queues import consume_from_rabbitmq
+
+import asyncio
+from sqlalchemy.future import select
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio import AsyncSession
+from auth.database import get_async_session, Users
+from yookassa import Configuration, Payment
+from fastapi import APIRouter, Depends, HTTPException
+from datetime import datetime, timedelta
+from fastapi_users import FastAPIUsers
+from auth.auth import auth_backend
+from auth.menager import get_user_manager
+from config import YOOKASSA_KEY, YOOKASSA_SHOP_ID
+from models.models import users
+from sqlalchemy import select, update
+import asyncio
+from datetime import datetime, timedelta
+from sqlalchemy.future import select
+from sqlalchemy.ext.asyncio import AsyncSession
 import time
 
 app = FastAPI(

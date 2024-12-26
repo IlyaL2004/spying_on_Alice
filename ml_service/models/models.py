@@ -16,7 +16,9 @@ users = Table(
     Column("is_verified", Boolean, default=False, nullable=False),
     Column("subscription_end", TIMESTAMP, nullable=True),
     Column("payment_id", String, nullable=True),
+    Column("payment_auto", Boolean, default=False),
     Column("payment_confirmation", Boolean, default=False),
+    Column("payment_method_id", String, default=False),
 )
 
 sessions = Table(

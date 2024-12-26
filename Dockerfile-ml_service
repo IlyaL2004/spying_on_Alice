@@ -8,6 +8,7 @@ WORKDIR /app
 COPY ./.env .
 COPY ./ml_service/ .
 RUN mkdir -p ./migrations/versions
+# VOLUME ./migrations/versions
 
 
 RUN pip install --upgrade pip

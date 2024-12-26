@@ -34,6 +34,12 @@ services:
     ports:
       - ${RABBITMQ_PORT}:15672
       - ${RABBITMQ_LOG_PORT}:5672
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "status"]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
 
 
   ml_service:
@@ -49,8 +55,10 @@ services:
     ports:
       - 8000:8000
     depends_on:
-      - postgres
-      - rabbitmq
+      postgres: 
+        condition: service_healthy
+      rabbitmq: 
+        condition: service_healthy
 
 
   parser_service:
@@ -62,7 +70,8 @@ services:
     ports:
       - 8001:8001
     depends_on:
-      - rabbitmq
+      rabbitmq: 
+        condition: service_healthy
 
 
   google_sites:
@@ -71,7 +80,8 @@ services:
       dockerfile: Dockerfile-google
     container_name: google_sites
     depends_on:
-      - rabbitmq
+      rabbitmq: 
+        condition: service_healthy
     ports:
       - 5002:5002
 
@@ -82,7 +92,8 @@ services:
       dockerfile: Dockerfile-yandex
     container_name: yandex_sites
     depends_on:
-      - rabbitmq
+      rabbitmq: 
+        condition: service_healthy
     ports:
       - 5001:5001
 
