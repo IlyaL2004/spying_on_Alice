@@ -108,7 +108,7 @@ async def predict_endpoint(
 
 
 
-@predict_and_confirmation_router.get("/check-session")
+@predict_and_confirmation_router.get("/check-session-confirmation-predict")
 async def check_session(
         email: str = Query(..., description="Email пользователя для проверки"),
         date: str = Query(..., description="Дата"),

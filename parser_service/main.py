@@ -130,6 +130,7 @@ def process_logs():
 
         result = {"list_values": list_values}
         print("send")
+        print(result)
         send_to_rabbitmq(result)
 
 

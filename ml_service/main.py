@@ -8,10 +8,30 @@ from ml_model.background_tasks import start_update_model_task
 from fastapi import FastAPI, Query, Depends, HTTPException
 import threading
 from auth.database import Users
+#from ml_service.models.models import sessions
 from payments.pay import router as payments_router
 from predict_and_confirmation_predict.predict_and_confirmation import predict_and_confirmation_router
 from queues.queues import run_event_loop
 from queues.queues import consume_from_rabbitmq
+import asyncio
+from sqlalchemy.future import select
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio import AsyncSession
+from auth.database import get_async_session, Users
+from yookassa import Configuration, Payment
+from fastapi import APIRouter, Depends, HTTPException
+from datetime import datetime, timedelta
+from fastapi_users import FastAPIUsers
+from auth.auth import auth_backend
+from auth.menager import get_user_manager
+from config import YOOKASSA_KEY, YOOKASSA_SHOP_ID
+from models.models import users
+from sqlalchemy import select, update
+import asyncio
+from datetime import datetime, timedelta
+from sqlalchemy.future import select
+from sqlalchemy.ext.asyncio import AsyncSession
+#from payments.background_tasks_auto_payment import update_subscriptions
 
 app = FastAPI(
     title="App"
@@ -22,9 +42,16 @@ app.include_router(predict_and_confirmation_router)
 class PredictionInput(BaseModel):
     list_values: List[Union[int, float, str]]
 
+
+
+# Запуск фоновой задачи в FastAPI
 @app.on_event("startup")
 async def startup_event():
+    # Запуск обновления модели
     await start_update_model_task()
+    # Запуск обновления подписок
+    #await update_subscriptions()
+
 
 fastapi_users = FastAPIUsers[Users, int](
     get_user_manager,
@@ -50,5 +77,3 @@ threading.Thread(target=run_event_loop, daemon=True).start()
 
 # Запуск потребителя RabbitMQ в отдельном потоке
 threading.Thread(target=consume_from_rabbitmq, daemon=True).start()
-
-
