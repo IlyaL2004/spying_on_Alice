@@ -1,0 +1,107 @@
+services:
+
+  postgres:
+    image: postgres:13.3
+    container_name: postgres
+    hostname: ${DB_HOST}
+    restart: always
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASS}
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_HOST=${DB_HOST}
+    ports:
+      - ${DB_PORT}:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${DB_USER}"]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+
+
+  rabbitmq:
+    image: rabbitmq:3.10.7-management
+    container_name: rabbitmq
+    hostname: ${RABBITMQ_HOST}
+    restart: always
+    environment:
+      - RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS=-rabbit log_levels [{connection,error},{default,error}] disk_free_limit 2147483648
+    volumes:
+      - rabbitmq_logs:/var/lib/rabbitmq
+    ports:
+      - ${RABBITMQ_PORT}:15672
+      - ${RABBITMQ_LOG_PORT}:5672
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "status"]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+
+
+  ml_service:
+    build: 
+      context: .
+      dockerfile: Dockerfile-ml_service
+      args:
+        - DB_NAME=${DB_NAME}
+        - DB_HOST=${DB_HOST}
+        - DB_USER=${DB_USER}
+        - DB_PASS=${DB_PASS}
+    container_name: ml_service
+    ports:
+      - 8000:8000
+    depends_on:
+      postgres: 
+        condition: service_healthy
+      rabbitmq: 
+        condition: service_healthy
+
+
+  parser_service:
+    build: 
+      context: .
+      dockerfile: Dockerfile-parser_service
+    container_name: parser_service
+    restart: always
+    ports:
+      - 8001:8001
+    depends_on:
+      rabbitmq: 
+        condition: service_healthy
+
+
+  google_sites:
+    build: 
+      context: .
+      dockerfile: Dockerfile-google
+    container_name: google_sites
+    depends_on:
+      rabbitmq: 
+        condition: service_healthy
+    ports:
+      - 5002:5002
+
+
+  yandex_sites:
+    build: 
+      context: .
+      dockerfile: Dockerfile-yandex
+    container_name: yandex_sites
+    depends_on:
+      rabbitmq: 
+        condition: service_healthy
+    ports:
+      - 5001:5001
+
+
+
+# networks:
+#   app_network:
+#     driver: bridge
+volumes:
+  rabbitmq_logs:
+  postgres_data:
